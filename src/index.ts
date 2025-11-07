@@ -6,6 +6,7 @@ import listRoutes from './routes/list.routes';
 import tagRoutes from './routes/tag.routes';
 import segmentRoutes from './routes/segment.routes';
 import importRoutes from './routes/import.routes';
+import campaignRoutes from './routes/campaign.routes';
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/lists', listRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/segments', segmentRoutes);
 app.use('/api/imports', importRoutes);
+app.use('/api/campaigns', campaignRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -63,6 +65,8 @@ app.listen(PORT, () => {
   console.log(`   - GET  /api/segments`);
   console.log(`   - POST /api/imports/csv`);
   console.log(`   - POST /api/imports/woocommerce`);
+  console.log(`   - POST /api/campaigns/send/list`);
+  console.log(`   - POST /api/campaigns/send/segment`);
 });
 
 export default app;
