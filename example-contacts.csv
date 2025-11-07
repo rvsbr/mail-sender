@@ -1,0 +1,11 @@
+email,first_name,last_name,status,street_address,city,state,zip_code,country,phone_number
+joao.silva@exemplo.com,João,Silva,ACTIVE,"Av. Paulista, 1000",São Paulo,SP,01310-100,Brasil,11999991111
+maria.santos@exemplo.com,Maria,Santos,ACTIVE,"Rua da Praia, 200",Rio de Janeiro,RJ,20000-000,Brasil,21988882222
+pedro.oliveira@exemplo.com,Pedro,Oliveira,PENDING,"Av. Afonso Pena, 500",Belo Horizonte,MG,30130-001,Brasil,31977773333
+ana.costa@exemplo.com,Ana,Costa,ACTIVE,"Rua XV de Novembro, 300",Curitiba,PR,80020-310,Brasil,41966664444
+carlos.ferreira@exemplo.com,Carlos,Ferreira,ACTIVE,"Av. Borges de Medeiros, 100",Porto Alegre,RS,90020-020,Brasil,51955555555
+lucia.almeida@exemplo.com,Lúcia,Almeida,ACTIVE,"Rua das Flores, 150",Salvador,BA,40000-000,Brasil,71944446666
+roberto.souza@exemplo.com,Roberto,Souza,BOUNCE,"Av. Boa Viagem, 2000",Recife,PE,51020-000,Brasil,81933337777
+fernanda.lima@exemplo.com,Fernanda,Lima,ACTIVE,"Rua Barão de Itapetininga, 50",São Paulo,SP,01042-000,Brasil,11922228888
+ricardo.mendes@exemplo.com,Ricardo,Mendes,UNSUBSCRIBED,"Av. Rio Branco, 1",Rio de Janeiro,RJ,20040-001,Brasil,21911119999
+juliana.rocha@exemplo.com,Juliana,Rocha,ACTIVE,"Rua Augusta, 500",São Paulo,SP,01305-000,Brasil,11900001111

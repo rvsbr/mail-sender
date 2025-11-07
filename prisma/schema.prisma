@@ -1,0 +1,190 @@
+// Prisma Schema para Email Marketing CRM
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Status do contato
+enum ContactStatus {
+  PENDING
+  ACTIVE
+  BOUNCE
+  UNSUBSCRIBED
+}
+
+// Modelo principal de Contatos
+model Contact {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  firstName     String?       @map("first_name")
+  lastName      String?       @map("last_name")
+  status        ContactStatus @default(PENDING)
+
+  // Endereço
+  streetAddress String?       @map("street_address")
+  city          String?
+  state         String?
+  zipCode       String?       @map("zip_code")
+  country       String?
+
+  // Contato
+  phoneNumber   String?       @map("phone_number")
+  ipAddress     String?       @map("ip_address")
+
+  // Dados WooCommerce
+  wooCustomerId    Int?      @map("woo_customer_id")
+  totalSpent       Decimal?  @map("total_spent") @db.Decimal(10, 2)
+  lastOrderDate    DateTime? @map("last_order_date")
+  lifetimeValue    Decimal?  @map("lifetime_value") @db.Decimal(10, 2)
+  customerSince    DateTime? @map("customer_since")
+  orderCount       Int?      @default(0) @map("order_count")
+
+  // Metadados
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  source        String?   // csv, woocommerce, manual, api
+
+  // Relacionamentos
+  lists         ContactList[]
+  tags          ContactTag[]
+  customFields  ContactCustomField[]
+  activities    ContactActivity[]
+
+  @@map("contacts")
+  @@index([email])
+  @@index([status])
+  @@index([wooCustomerId])
+}
+
+// Listas de Contatos
+model List {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  contacts    ContactList[]
+
+  @@map("lists")
+}
+
+// Relacionamento Many-to-Many entre Contacts e Lists
+model ContactList {
+  id         String   @id @default(uuid())
+  contactId  String   @map("contact_id")
+  listId     String   @map("list_id")
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  list       List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, listId])
+  @@map("contact_lists")
+  @@index([contactId])
+  @@index([listId])
+}
+
+// Tags
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String?  // Para UI, ex: #FF5733
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contacts  ContactTag[]
+
+  @@map("tags")
+}
+
+// Relacionamento Many-to-Many entre Contacts e Tags
+model ContactTag {
+  id        String   @id @default(uuid())
+  contactId String   @map("contact_id")
+  tagId     String   @map("tag_id")
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, tagId])
+  @@map("contact_tags")
+  @@index([contactId])
+  @@index([tagId])
+}
+
+// Segmentos Dinâmicos (Dynamic Segments)
+model Segment {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  filters     Json     // Armazena os filtros como JSON
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("segments")
+}
+
+// Campos Customizados (Custom Fields)
+model CustomField {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  fieldType   String   @map("field_type") // text, number, date, boolean
+  label       String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  contactValues ContactCustomField[]
+
+  @@map("custom_fields")
+}
+
+// Valores dos campos customizados para cada contato
+model ContactCustomField {
+  id            String      @id @default(uuid())
+  contactId     String      @map("contact_id")
+  customFieldId String      @map("custom_field_id")
+  value         String      // Armazenado como string, convertido conforme fieldType
+
+  contact       Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, customFieldId])
+  @@map("contact_custom_fields")
+  @@index([contactId])
+}
+
+// Atividades do Contato (para tracking)
+model ContactActivity {
+  id          String   @id @default(uuid())
+  contactId   String   @map("contact_id")
+  activityType String  @map("activity_type") // email_sent, email_opened, link_clicked, etc
+  description String?
+  metadata    Json?    // Dados adicionais
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("contact_activities")
+  @@index([contactId])
+  @@index([activityType])
+}
+
+// Importações (para tracking de imports CSV/WooCommerce)
+model Import {
+  id          String   @id @default(uuid())
+  source      String   // csv, woocommerce
+  filename    String?
+  totalRows   Int      @map("total_rows")
+  successRows Int      @map("success_rows")
+  errorRows   Int      @map("error_rows")
+  errors      Json?    // Detalhes dos erros
+  status      String   // pending, processing, completed, failed
+  createdAt   DateTime @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  @@map("imports")
+}
